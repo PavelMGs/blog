@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 
 const index = () => {
     useEffect(() => {
-        console.log('object');
+console.log('object');
     }, [])
     return (
-<div>
-fdg
+        <div>
+            fdg\asdasd
         </div>
     )
 }
