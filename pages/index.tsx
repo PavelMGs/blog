@@ -6,7 +6,7 @@ console.log('object');
     }, [])
     return (
         <div>
-            fdg\asdasd
+ fdg\asdasd
         </div>
     )
 }
