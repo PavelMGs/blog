@@ -5,8 +5,8 @@ const index = () => {
         console.log('object');
     }, [])
     return (
-        <div>
-            fdg
+<div>
+fdg
         </div>
     )
 }
