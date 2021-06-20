@@ -13,6 +13,7 @@ const Wrapper = styled.div`
     flex-direction: column;
     justify-content: center;
     height: 100vh;
+    margin: 70px auto 20px;
     padding: 30px 50px;
     text-align: center;
     background: rgba(0, 0, 0, 0.05);
