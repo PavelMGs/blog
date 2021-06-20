@@ -11,13 +11,18 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
-    justify-content: center;
-    height: 100vh;
-    margin: 70px auto 20px;
+    min-height: 100vh;
     padding: 30px 50px;
     text-align: center;
     background: rgba(0, 0, 0, 0.05);
     border-radius: 4px;
+`;
+
+const Posts = styled.div`
+    margin-top: 70px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 `;
 
 const index = () => {
@@ -44,16 +49,18 @@ const index = () => {
     return (
         <Wrapper>
             <Header />
-            {
-                posts.length
-                    ? posts.map(item => <Post
-                        title={item.title}
-                        body={item.body}
-                        id={item.id}
-                        key={`${item.id}_post`}
-                    />)
-                    : <div>Loading...</div>
-            }
+            <Posts>
+                {
+                    posts.length
+                        ? posts.map(item => <Post
+                            title={item.title}
+                            body={item.body}
+                            id={item.id}
+                            key={`${item.id}_post`}
+                        />)
+                        : <div>Loading...</div>
+                }
+            </Posts>
         </Wrapper>
     )
 }
