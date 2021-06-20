@@ -1,13 +1,14 @@
-import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
+import NewCommentForm from '../../components/Form/NewCommentForm';
 import Header from '../../components/Header/Header';
 import { ICommentRes, IPost } from '../../interfaces';
 import { RootState } from '../../redux';
 import { postsAction } from '../../redux/actions/postActions';
+import { getData } from '../../utils/getData';
 
 const Wrapper = styled.div`
     display: flex;
@@ -45,45 +46,6 @@ const CommentsBlock = styled.div`
     margin-top: auto;
 `;
 
-const StyledForm = styled.form`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-
-`;
-
-const StyledInput = styled.input`
-    padding: 15px;
-    margin: 10px auto;
-
-    width: 85%;
-    height: 45px;
-
-    border-radius: 4px;
-    border: none;
-    box-shadow: 0 0 5px #424242;
-
-    color: #424242;
-    font-size: 20px;
-    font-style: italic;
-`
-
-const StyledSubmit = styled.input`
-    height: 45px;
-    width: 15%;
-    margin: 10px auto;
-
-    background: #1e88e5;
-
-    font-size: 20px;
-    color: white;
-
-    border-radius: 4px;
-    border: none;
-    box-shadow: 0 0 5px #424242;
-`;
-
 const StyledCommentsHeader = styled.h3`
     color: #212121;
     font-size: 42px;
@@ -93,51 +55,27 @@ const StyledCommentsHeader = styled.h3`
 const post = () => {
     const { query } = useRouter();
     const [currentPost, setCurrentPost] = useState<IPost | undefined>();
-    const [commentValue, setCommentValue] = useState('');
     const posts = useSelector((state: RootState) => state.posts);
     const [comments, setComments] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        // если в сторе ничего не лежит, делаем запрос
         if (!posts.length) {
-            axios.get('https://simple-blog-api.crew.red/posts') // тут можно запрашивать и конкретный пост, но...
-                .then(res => res.data)
+            getData("https://simple-blog-api.crew.red/posts")
                 .then(data => dispatch(postsAction(data)))
         }
     }, [])
 
     useEffect(() => {
-        // дожидаемся, пока подгрузится квери и выбираем нужный пост по параметрам url
         if (query.id) {
             const post = posts.find((item: IPost) => item.id === +query.id!);
             setCurrentPost(post);
-            axios.get(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
-                .then(res => res.data)
+            getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
                 .then(data => setComments(data.comments))
         }
     }, [query.id, posts])
 
-    const handleSubmit = (e: FormEvent) => {
-        e.preventDefault();
 
-        if (commentValue.length > 0) {
-            const data = {
-                "postId": +query.id!,
-                "body": commentValue
-            };
-
-            axios({
-                method: 'post',
-                url: 'https://simple-blog-api.crew.red/comments',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                data: data
-            });
-        }
-        setCommentValue('');
-    }
 
     if (!currentPost) {
         return (
@@ -163,19 +101,10 @@ const post = () => {
                 <StyledCommentsHeader>
                     Comments
                 </StyledCommentsHeader>
-                <StyledForm
-                    onSubmit={handleSubmit}
-                >
-                    <StyledInput
-                        placeholder='Type your comment'
-                        value={commentValue}
-                        onChange={(e) => setCommentValue(e.target.value)}
-                    />
-                    <StyledSubmit type='submit' value="Submit" />
-                </StyledForm>
+                <NewCommentForm />
                 {
                     comments.length
-                        ? comments.map((item: ICommentRes, index) => item.body.length ? <Comment body={item.body} id={item.id} key={`${index}_comment_${query.id}`} /> : null)
+                        ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
                         : 'No comments here'
                 }
             </CommentsBlock>

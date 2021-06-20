@@ -18,6 +18,8 @@ const StyledH2 = styled.h2`
         color: #212121;
         font-size: 36px;
         font-style: italic;
+
+        cursor: pointer;
 `;
 
 const StyledArticle = styled.article`
@@ -44,19 +46,19 @@ const StyledArticle = styled.article`
         justify-content: center;
 `;
 
-const Post: React.FC<IPost> = (props: IPost) => {
+const Post: React.FC<IPost> = ({ title, body, id }: IPost) => {
     return (
 
         <Wrapper>
-            <Link href={`posts/${props.id}`}>
+            <Link href={`posts/${id}`}>
                 <StyledH2>
-                    {props.title}
+                    {title}
                 </StyledH2>
             </Link>
             <StyledArticle>
                 {
-                    props.body.length
-                        ? props.body
+                    body.length
+                        ? body
                         : 'No description...'
                 }
             </StyledArticle>

@@ -13,7 +13,6 @@ const Wrapper = styled.div`
 
 interface IComment {
     body: string
-    id: number
 }
 
 const Comment = ({ body }: IComment) => {
