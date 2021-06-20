@@ -6,6 +6,7 @@ import Link from 'next/link';
 const Wrapper = styled.div`
     position: fixed;
     top: 0;
+    left: 0;
     height: 75px;
     width: 100%;
     background: #3f51b5;

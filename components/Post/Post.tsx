@@ -46,20 +46,21 @@ const StyledArticle = styled.article`
 
 const Post: React.FC<IPost> = (props: IPost) => {
     return (
-        <Link href={`posts/${props.id}`}>
-            <Wrapper>
-                <a><StyledH2>
+
+        <Wrapper>
+            <Link href={`posts/${props.id}`}>
+                <StyledH2>
                     {props.title}
-                </StyledH2></a>
-                <StyledArticle>
-                    {
-                        props.body.length
-                            ? props.body
-                            : 'No description...'
-                    }
-                </StyledArticle>
-            </Wrapper>
-        </Link>
+                </StyledH2>
+            </Link>
+            <StyledArticle>
+                {
+                    props.body.length
+                        ? props.body
+                        : 'No description...'
+                }
+            </StyledArticle>
+        </Wrapper>
     )
 }
 
