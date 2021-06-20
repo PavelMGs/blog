@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
-import Link from 'next/link';
 import React, { FormEvent, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
+import Header from '../../components/Header/Header';
 import { ICommentRes, IPost } from '../../interfaces';
 import { RootState } from '../../redux';
 import { postsAction } from '../../redux/actions/postActions';
@@ -16,22 +16,23 @@ const Wrapper = styled.div`
 
     width: 100vw;
     min-height: 100vh;
+    background: #ffebee;
 `
 const StyledH1 = styled.h1`
-    font-size: 6em;
+    color: #212121;
+    font-size: 42px;
+    font-style: italic;
+
+    margin-top: 95px
 `
 const StyledArticle = styled.article`
-    font-size: 2em;
-`;
+    color: #424242;
+    font-size: 32px;
+    font-style: italic;
 
-const LinkWrapper = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-`
+    width: 80%;
 
-const StyledA = styled.a`
-    font-size: 2em;
+    text-align: justify;
 `;
 
 const CommentsBlock = styled.div`
@@ -40,7 +41,7 @@ const CommentsBlock = styled.div`
     align-items: center;
     width: 90%;
 
-    margin-bottom: 10px;
+    margin-bottom: 60px;
     margin-top: auto;
 `;
 
@@ -53,25 +54,40 @@ const StyledForm = styled.form`
 `;
 
 const StyledInput = styled.input`
-    width: 85%;
+    padding: 15px;
     margin: 10px auto;
 
-    height: 3em;
+    width: 85%;
+    height: 45px;
 
-    border-radius: 4px
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0 0 5px #424242;
+
+    color: #424242;
+    font-size: 20px;
+    font-style: italic;
 `
 
 const StyledSubmit = styled.input`
-    height: 3em;
+    height: 45px;
     width: 15%;
     margin: 10px auto;
 
+    background: #1e88e5;
+
+    font-size: 20px;
+    color: white;
+
     border-radius: 4px;
+    border: none;
+    box-shadow: 0 0 5px #424242;
 `;
 
 const StyledCommentsHeader = styled.h3`
-    color: #313131;
-    font-size: 3em;
+    color: #212121;
+    font-size: 42px;
+    font-style: italic;
 `;
 
 const post = () => {
@@ -85,7 +101,7 @@ const post = () => {
     useEffect(() => {
         // если в сторе ничего не лежит, делаем запрос
         if (!posts.length) {
-            axios.get('https://simple-blog-api.crew.red/posts')
+            axios.get('https://simple-blog-api.crew.red/posts') // тут можно запрашивать и конкретный пост, но...
                 .then(res => res.data)
                 .then(data => dispatch(postsAction(data)))
         }
@@ -105,30 +121,28 @@ const post = () => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
-        const data = {
-            "postId": +query.id!,
-            "body": commentValue
-        };
+        if (commentValue.length > 0) {
+            const data = {
+                "postId": +query.id!,
+                "body": commentValue
+            };
 
-        axios({
-            method: 'post',
-            url: 'https://simple-blog-api.crew.red/comments',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data
-        });
+            axios({
+                method: 'post',
+                url: 'https://simple-blog-api.crew.red/comments',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: data
+            });
+        }
         setCommentValue('');
     }
 
     if (!currentPost) {
         return (
             <Wrapper>
-                <LinkWrapper>
-                    <Link href={'/'}>
-                        <StyledA>Home</StyledA>
-                    </Link>
-                </LinkWrapper>
+                <Header />
                 <StyledH1>
                     Post isn`t available
                 </StyledH1>
@@ -138,10 +152,7 @@ const post = () => {
 
     return (
         <Wrapper>
-            <LinkWrapper>
-                <Link href={'/'}>
-                    <StyledA>Home</StyledA>
-                </Link></LinkWrapper>
+            <Header />
             <StyledH1>
                 {currentPost.title}
             </StyledH1>
@@ -156,7 +167,7 @@ const post = () => {
                     onSubmit={handleSubmit}
                 >
                     <StyledInput
-                        placeholder='type your comment'
+                        placeholder='Type your comment'
                         value={commentValue}
                         onChange={(e) => setCommentValue(e.target.value)}
                     />
@@ -164,7 +175,7 @@ const post = () => {
                 </StyledForm>
                 {
                     comments.length
-                        ? comments.map((item: ICommentRes, index) => <Comment body={item.body} id={item.id} key={`${index}_comment_${query.id}`} />)
+                        ? comments.map((item: ICommentRes, index) => item.body.length ? <Comment body={item.body} id={item.id} key={`${index}_comment_${query.id}`} /> : null)
                         : 'No comments here'
                 }
             </CommentsBlock>

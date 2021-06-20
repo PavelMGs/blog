@@ -8,7 +8,6 @@ export const postsReducer = (
   switch (action.type) {
     case POSTS: {
       return action.payload;
-      break;
     }
 
     default: {

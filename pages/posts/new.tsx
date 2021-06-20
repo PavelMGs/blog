@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
-import Link from 'next/link';
 import React, { FormEvent, useState } from 'react';
 import styled from 'styled-components';
+import Header from '../../components/Header/Header';
 
 const Wrapper = styled.div`
     display: flex;
@@ -12,18 +12,8 @@ const Wrapper = styled.div`
 
     width: 100vw;
     height: 100vh;
+    background: #ffebee;
 `;
-
-const LinkWrapper = styled.div`
-    position: absolute;
-    top: 10px;
-    right: 10px;
-`
-
-const StyledA = styled.a`
-    font-size: 2em;
-`;
-
 const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
@@ -36,8 +26,13 @@ const StyledForm = styled.form`
 const StyledTitle = styled.input`
     width: 57%;
     margin: 10px auto;
+    padding: 15px;
 
-    height: 3em;
+    height: 55px;
+
+    color: #616161;
+    font-size: 20px;
+    font-style: italic;
 
     border-radius: 4px
 `
@@ -49,15 +44,26 @@ const StyledBody = styled.textarea`
     width: 57%;
     margin: 10px auto;
 
-    height: 20em;
+    padding: 15px;
+
+    height: 365px;
+
+    color: #616161;
+    font-size: 20px;
+    font-style: italic;
 
     border-radius: 4px
 `
 
 const StyledSubmit = styled.input`
-    height: 3em;
-    width: 15%;
+    height: 45px;
+    width: 125px;
     margin: 10px auto;
+
+    background: #1e88e5;
+
+    font-size: 20px;
+    color: white;
 
     border-radius: 4px;
 `;
@@ -70,31 +76,33 @@ const NewPost = () => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
 
-        const data = {
-            "title": title,
-            "body": body,
-        };
+        if (body.length <= 0) {
+            alert('You did not write a post')
+        } else if (title.length <= 0) {
+            alert('Choose a title')
+        } else {
+            const data = {
+                "title": title,
+                "body": body,
+            };
 
-        axios({
-            method: 'post',
-            url: 'https://simple-blog-api.crew.red/posts',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data
-        });
+            axios({
+                method: 'post',
+                url: 'https://simple-blog-api.crew.red/posts',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                data: data
+            });
 
-        alert('Post is successfully created')
+            alert('Post is successfully created')
 
-        router.push('/');
+            router.push('/');
+        }
     }
     return (
         <Wrapper>
-            <LinkWrapper>
-                <Link href={'/'}>
-                    <StyledA>Home</StyledA>
-                </Link>
-            </LinkWrapper>
+            <Header />
             <StyledForm
                 onSubmit={handleSubmit}
             >
