@@ -1,5 +1,5 @@
 import { IPost, IPostsAction } from "../../interfaces";
-import { POSTS } from "../actions/actionsNames";
+import { POST, POSTS } from "../actions/actionsNames";
 
 export const postsReducer = (
   state: IPost[] | [] = [],
@@ -8,6 +8,10 @@ export const postsReducer = (
   switch (action.type) {
     case POSTS: {
       return action.payload;
+    }
+
+    case POST: {
+      return [...state, action.payload];
     }
 
     default: {

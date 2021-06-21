@@ -56,7 +56,7 @@ const post = () => {
     const { query } = useRouter();
     const [currentPost, setCurrentPost] = useState<IPost | undefined>();
     const posts = useSelector((state: RootState) => state.posts);
-    const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState<ICommentRes[]>([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -75,7 +75,10 @@ const post = () => {
         }
     }, [query.id, posts])
 
-
+    const handleAddComment = (newComment: ICommentRes) => {
+        const newCommentsArr = [...comments, newComment];
+        setComments(newCommentsArr);
+    }
 
     if (!currentPost) {
         return (
@@ -101,7 +104,7 @@ const post = () => {
                 <StyledCommentsHeader>
                     Comments
                 </StyledCommentsHeader>
-                <NewCommentForm />
+                <NewCommentForm handleAddComment={handleAddComment} />
                 {
                     comments.length
                         ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)

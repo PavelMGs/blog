@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
 import React, { FormEvent, useState } from 'react';
 import styled from 'styled-components';
+import { ICommentRes } from '../../interfaces';
 
 const StyledForm = styled.form`
     display: flex;
@@ -42,7 +43,11 @@ const StyledSubmit = styled.input`
     box-shadow: 0 0 5px #424242;
 `;
 
-const NewCommentForm = () => {
+interface INewCommentForm {
+    handleAddComment: (newComment: ICommentRes) => void
+}
+
+const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }) => {
     const { query } = useRouter();
     const [commentValue, setCommentValue] = useState('');
 
@@ -62,7 +67,9 @@ const NewCommentForm = () => {
                     'Content-Type': 'application/json'
                 },
                 data: data
-            });
+            })
+                .then(res => res.data)
+                .then(data => handleAddComment(data));
         }
         setCommentValue('');
     }

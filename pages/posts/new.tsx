@@ -1,8 +1,11 @@
 import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
 import React, { FormEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Header from '../../components/Header/Header';
+import { IPost } from '../../interfaces';
+import { postAction } from '../../redux/actions/postActions';
 
 const Wrapper = styled.div`
     display: flex;
@@ -71,7 +74,8 @@ const StyledSubmit = styled.input`
 const NewPost = () => {
     const [title, setTitle] = useState('');
     const [body, setBody] = useState('');
-    const router = useRouter()
+    const router = useRouter();
+    const dispatch = useDispatch();
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
@@ -93,7 +97,10 @@ const NewPost = () => {
                     'Content-Type': 'application/json'
                 },
                 data: data
-            });
+            })
+                .then(res => res.data)
+                .then((data: IPost) => dispatch(postAction(data)))
+                ;
 
             alert('Post is successfully created')
 
