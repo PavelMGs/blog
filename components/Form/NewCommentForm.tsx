@@ -47,7 +47,7 @@ interface INewCommentForm {
     handleAddComment: (newComment: ICommentRes) => void
 }
 
-const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }) => {
+const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }: INewCommentForm) => {
     const { query } = useRouter();
     const [commentValue, setCommentValue] = useState('');
 
