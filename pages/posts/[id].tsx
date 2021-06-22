@@ -52,35 +52,43 @@ const StyledCommentsHeader = styled.h3`
     font-style: italic;
 `;
 
-const post = () => {
-    const { query } = useRouter();
-    const [currentPost, setCurrentPost] = useState<IPost | undefined>();
-    const posts = useSelector((state: RootState) => state.posts);
-    const [comments, setComments] = useState<ICommentRes[]>([]);
-    const dispatch = useDispatch();
+interface IPostComponent {
+    post: {
+        title: string;
+        body: string;
+        id: number;
+        comments: ICommentRes[];
+    }
+}
 
-    useEffect(() => {
-        if (!posts.length) {
-            getData("https://simple-blog-api.crew.red/posts")
-                .then(data => dispatch(postsAction(data)))
-        }
-    }, [])
+const post = ({ post }: IPostComponent) => {
+    // const { query } = useRouter();
+    // const [currentPost, setCurrentPost] = useState<IPost | undefined>();
+    // const posts = useSelector((state: RootState) => state.posts);
+    // const [comments, setComments] = useState<ICommentRes[]>([]);
+    // const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (query.id) {
-            const post = posts.find((item: IPost) => item.id === +query.id!);
-            setCurrentPost(post);
-            getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
-                .then(data => setComments(data.comments))
-        }
-    }, [query.id, posts])
+    // useEffect(() => {
+    //     if (!posts.length) {
+    //         dispatch(postsAction(data));
+    //     }
+    // }, [])
+
+    // useEffect(() => {
+    //     if (query.id) {
+    //         const post = data.find((item: IPost) => item.id === +query.id!);
+    //         // setCurrentPost(post);
+    //         getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
+    //             .then(data => setComments(data.comments))
+    //     }
+    // }, [query.id, data])
 
     const handleAddComment = (newComment: ICommentRes) => {
         const newCommentsArr = [...comments, newComment];
         setComments(newCommentsArr);
     }
 
-    if (!currentPost) {
+    if (!post) {
         return (
             <Wrapper>
                 <Header />
@@ -95,10 +103,10 @@ const post = () => {
         <Wrapper>
             <Header />
             <StyledH1>
-                {currentPost.title}
+                {post.title}
             </StyledH1>
             <StyledArticle>
-                {currentPost.body}
+                {post.body}
             </StyledArticle>
             <CommentsBlock>
                 <StyledCommentsHeader>
@@ -106,13 +114,32 @@ const post = () => {
                 </StyledCommentsHeader>
                 <NewCommentForm handleAddComment={handleAddComment} />
                 {
-                    comments.length
-                        ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                    post.comments.length
+                        ? post.comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
                         : 'No comments here'
                 }
             </CommentsBlock>
         </Wrapper >
     )
+}
+
+
+export async function getStaticPaths() {
+    const res = await fetch('https://simple-blog-api.crew.red/posts')
+    const posts = await res.json()
+
+    const paths = posts.map((post: IPost) => ({
+        params: { id: `${post.id}` },
+    }))
+
+    return { paths, fallback: false }
+}
+
+export async function getStaticProps({ params }: any) {
+    const post = await getData(`https://simple-blog-api.crew.red/posts/${params.id}?_embed=comments`)
+    return {
+        props: { post: post }
+    };
 }
 
 export default post;

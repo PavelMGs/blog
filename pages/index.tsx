@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
 import { RootState } from '../redux';
-import { postsAction } from '../redux/actions/postActions';
+import { postAction, postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
+import { IPost } from '../interfaces';
 
 const Wrapper = styled.div`
     display: flex;
@@ -25,19 +26,25 @@ const Posts = styled.div`
     flex-direction: column;
 `;
 
-const index = () => {
+interface IIndex {
+    data: IPost[],
+}
+
+const index = ({ data }: IIndex) => {
     const posts = useSelector((state: RootState) => state.posts)
     const dispatch = useDispatch();
 
     useEffect(() => {
         if (!posts.length) {
-            getData('https://simple-blog-api.crew.red/posts')
-                .then(data => dispatch(postsAction(data)))
+            // getData('https://simple-blog-api.crew.red/posts')
+            //     .then(data => dispatch(postsAction(data)))
+
+            dispatch(postsAction(data));
         }
     }, [])
 
 
-    if (!posts.length) {
+    if (!data.length) {
         return (
             <Wrapper>
                 Loading...
@@ -49,8 +56,8 @@ const index = () => {
             <Header />
             <Posts>
                 {
-                    posts.length
-                        ? posts.map(item => <Post
+                    data.length
+                        ? data.map(item => <Post
                             title={item.title}
                             body={item.body}
                             id={item.id}
@@ -61,6 +68,13 @@ const index = () => {
             </Posts>
         </Wrapper>
     )
+}
+
+export async function getStaticProps() {
+    const data = await getData('https://simple-blog-api.crew.red/posts')
+    return {
+        props: { data: data }
+    };
 }
 
 export default index;
