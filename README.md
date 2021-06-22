@@ -12,4 +12,4 @@ yarn dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-Deploy: https://blog-ki1bb3fdz-pavelmgs.vercel.app/
+Deploy: https://blog-rosy-eight.vercel.app/
