@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
 import { RootState } from '../redux';
-import { postAction, postsAction } from '../redux/actions/postActions';
+import { postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
 import { IPost } from '../interfaces';
