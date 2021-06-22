@@ -1,13 +1,9 @@
-import { useRouter } from 'next/dist/client/router';
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
 import NewCommentForm from '../../components/Form/NewCommentForm';
 import Header from '../../components/Header/Header';
 import { ICommentRes, IPost } from '../../interfaces';
-import { RootState } from '../../redux';
-import { postsAction } from '../../redux/actions/postActions';
 import { getData } from '../../utils/getData';
 
 const Wrapper = styled.div`
@@ -65,14 +61,12 @@ const post = ({ post }: IPostComponent) => {
     // const { query } = useRouter();
     // const [currentPost, setCurrentPost] = useState<IPost | undefined>();
     // const posts = useSelector((state: RootState) => state.posts);
-    // const [comments, setComments] = useState<ICommentRes[]>([]);
+    const [comments, setComments] = useState<ICommentRes[]>([]);
     // const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     if (!posts.length) {
-    //         dispatch(postsAction(data));
-    //     }
-    // }, [])
+    useEffect(() => {
+        setComments(post.comments)
+    }, [])
 
     // useEffect(() => {
     //     if (query.id) {
@@ -114,9 +108,11 @@ const post = ({ post }: IPostComponent) => {
                 </StyledCommentsHeader>
                 <NewCommentForm handleAddComment={handleAddComment} />
                 {
-                    post.comments.length
-                        ? post.comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
-                        : 'No comments here'
+                    comments.length
+                        ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                        : post.comments.length
+                            ? post.comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                            : 'No comments here'
                 }
             </CommentsBlock>
         </Wrapper >
