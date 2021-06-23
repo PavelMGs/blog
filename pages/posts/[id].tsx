@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/dist/client/router';
+import React, { useEffect, useReducer, useState } from 'react';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
 import NewCommentForm from '../../components/Form/NewCommentForm';
@@ -58,28 +59,29 @@ interface IPostComponent {
 }
 
 const post = ({ post }: IPostComponent) => {
-    // const { query } = useRouter();
-    // const [currentPost, setCurrentPost] = useState<IPost | undefined>();
+    const { query } = useRouter();
+    const [currentPost, setCurrentPost] = useState<IPost | undefined>();
+    // eslint-disable-next-line no-unused-vars   
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0); // ignored На то и ignored, что использовать мы его не будем. В то же время нам нужно деструктуриролвать второй аргумент.
     // const posts = useSelector((state: RootState) => state.posts);
-    const [comments, setComments] = useState<ICommentRes[]>([]);
     // const dispatch = useDispatch();
 
-    useEffect(() => {
-        setComments(post.comments)
-    }, [])
-
     // useEffect(() => {
-    //     if (query.id) {
-    //         const post = data.find((item: IPost) => item.id === +query.id!);
-    //         // setCurrentPost(post);
-    //         getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
-    //             .then(data => setComments(data.comments))
-    //     }
-    // }, [query.id, data])
+    //     setComments(post.comments)
+    // }, [])
+
+    useEffect(() => {
+        if (query.id) {
+            getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
+                .then(data => setCurrentPost(data))
+        }
+    }, [query.id])
 
     const handleAddComment = (newComment: ICommentRes) => {
-        const newCommentsArr = [...comments, newComment];
-        setComments(newCommentsArr);
+        const newCurrentPost = currentPost;
+        newCurrentPost?.comments ? newCurrentPost?.comments.push(newComment) : null;
+        setCurrentPost(newCurrentPost);
+        forceUpdate();
     }
 
     if (!post) {
@@ -108,8 +110,7 @@ const post = ({ post }: IPostComponent) => {
                 </StyledCommentsHeader>
                 <NewCommentForm handleAddComment={handleAddComment} />
                 {
-                    comments.length
-                        ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                    currentPost ? currentPost.comments?.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
                         : post.comments.length
                             ? post.comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
                             : 'No comments here'

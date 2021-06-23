@@ -2,6 +2,7 @@ export interface IPost {
   title: string;
   body: string;
   id: number;
+  comments?: ICommentRes[];
 }
 
 export interface IPostsAction {

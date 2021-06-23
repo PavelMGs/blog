@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
 import { RootState } from '../redux';
-import { postAction, postsAction } from '../redux/actions/postActions';
+import { postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
 import { IPost } from '../interfaces';
@@ -36,10 +36,8 @@ const index = ({ data }: IIndex) => {
 
     useEffect(() => {
         if (!posts.length) {
-            // getData('https://simple-blog-api.crew.red/posts')
-            //     .then(data => dispatch(postsAction(data)))
-
-            dispatch(postsAction(data));
+            getData('https://simple-blog-api.crew.red/posts')
+                .then(data => dispatch(postsAction(data)))
         }
     }, [])
 
@@ -56,14 +54,21 @@ const index = ({ data }: IIndex) => {
             <Header />
             <Posts>
                 {
-                    data.length
-                        ? data.map(item => <Post
+                    posts.length
+                        ? posts.map(item => <Post
                             title={item.title}
                             body={item.body}
                             id={item.id}
                             key={item.id}
                         />)
-                        : <div>Loading...</div>
+                        : data.length
+                            ? data.map(item => <Post
+                                title={item.title}
+                                body={item.body}
+                                id={item.id}
+                                key={item.id}
+                            />)
+                            : <div>Loading...</div>
                 }
             </Posts>
         </Wrapper>
