@@ -32,6 +32,7 @@ interface IIndex {
 }
 
 const index = ({ data }: IIndex) => {
+    // eslint-disable-next-line no-unused-vars
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
     const posts = useSelector((state: RootState) => state.posts)
     const dispatch = useDispatch();
