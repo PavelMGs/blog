@@ -46,7 +46,6 @@ const index = ({ data }: IIndex) => {
     }, [])
 
     useEffect(() => {
-        console.log('USe', posts);
         forceUpdate()
     }, [posts])
 
