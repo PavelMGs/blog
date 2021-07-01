@@ -7,8 +7,6 @@ import { postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
 import { IPost } from '../interfaces';
-import axios from 'axios';
-import post from './posts/[id]';
 
 const Wrapper = styled.div`
     display: flex;
