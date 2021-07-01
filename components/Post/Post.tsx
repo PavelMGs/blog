@@ -57,7 +57,7 @@ const Post: React.FC<IPost> = ({ title, body, id }: IPost) => {
             </Link>
             <StyledArticle>
                 {
-                    body.length
+                    body?.length
                         ? body
                         : 'No description...'
                 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
@@ -7,6 +7,8 @@ import { postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
 import { IPost } from '../interfaces';
+import axios from 'axios';
+import post from './posts/[id]';
 
 const Wrapper = styled.div`
     display: flex;
@@ -24,6 +26,7 @@ const Posts = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
+    width: 100%;
 `;
 
 interface IIndex {
@@ -31,20 +34,28 @@ interface IIndex {
 }
 
 const index = ({ data }: IIndex) => {
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
     const posts = useSelector((state: RootState) => state.posts)
     const dispatch = useDispatch();
 
     useEffect(() => {
         if (!posts.length) {
-            getData('https://simple-blog-api.crew.red/posts')
+            getData('https://mg-blog-api.herokuapp.com/api/blog')
                 .then(data => dispatch(postsAction(data)))
         }
+
     }, [])
 
+    useEffect(() => {
+        console.log('USe', posts);
+        forceUpdate()
+    }, [posts])
 
-    if (!data.length) {
+
+    if (!posts.length) {
         return (
             <Wrapper>
+                <Header />
                 Loading...
             </Wrapper>
         )

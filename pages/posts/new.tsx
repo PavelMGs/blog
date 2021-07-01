@@ -92,7 +92,7 @@ const NewPost = () => {
 
             axios({
                 method: 'post',
-                url: 'https://simple-blog-api.crew.red/posts',
+                url: 'https://mg-blog-api.herokuapp.com/api/blog',
                 headers: {
                     'Content-Type': 'application/json'
                 },
