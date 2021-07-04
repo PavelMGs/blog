@@ -59,7 +59,7 @@ const index = ({ data }: IIndex) => {
     }, [posts])
 
 
-    if (!posts.length) {
+    if (!data.length && !posts.length) {
         return (
             <Wrapper>
                 <Header />
