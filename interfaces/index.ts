@@ -7,12 +7,7 @@ export interface IPost {
 
 export interface IPostsAction {
   type: string;
-  payload: IPost[];
-}
-
-export interface IPostAction {
-  type: string;
-  payload: IPost;
+  payload: IPost[] | IPost;
 }
 
 export interface ICommentRes {

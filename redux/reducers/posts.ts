@@ -1,9 +1,9 @@
-import { IPost, IPostAction, IPostsAction } from "../../interfaces";
+import { IPost, IPostsAction } from "../../interfaces";
 import { POST, POSTS } from "../actions/actionsNames";
 
 export const postsReducer = (
   state: IPost[] | [] = [],
-  action: IPostsAction | IPostAction
+  action: IPostsAction
 ) => {
   switch (action.type) {
     case POSTS: {

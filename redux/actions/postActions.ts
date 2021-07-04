@@ -1,12 +1,12 @@
-import { IPost, IPostsAction } from "../../interfaces";
+import { IPost } from "../../interfaces";
 import { POST, POSTS } from "./actionsNames";
 
-export const postsAction = (payload: IPost[]): IPostsAction => ({
+export const postsAction = (payload: IPost[]) => ({
   type: POSTS,
   payload,
 });
 
-export const postAction = (payload: IPost): IPostsAction => ({
+export const postAction = (payload: IPost) => ({
   type: POST,
   payload,
 });
