@@ -1,10 +1,13 @@
 import { useRouter } from 'next/dist/client/router';
 import React, { useEffect, useReducer, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
 import NewCommentForm from '../../components/Form/NewCommentForm';
 import Header from '../../components/Header/Header';
 import { ICommentRes, IPost } from '../../interfaces';
+// import { RootState } from '../../redux';
+import { postsAction } from '../../redux/actions/postActions';
 import { getData } from '../../utils/getData';
 
 const Wrapper = styled.div`
@@ -61,19 +64,28 @@ interface IPostComponent {
 const post = ({ post }: IPostComponent) => {
     const { query } = useRouter();
     const [currentPost, setCurrentPost] = useState<IPost | undefined>();
+    const [comments, setComments] = useState<ICommentRes[] | []>([])
     // eslint-disable-next-line no-unused-vars   
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0); // ignored На то и ignored, что использовать мы его не будем. В то же время нам нужно деструктуриролвать второй аргумент.
     // const posts = useSelector((state: RootState) => state.posts);
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     setComments(post.comments)
-    // }, [])
 
     useEffect(() => {
         if (query.id) {
-            getData(`https://simple-blog-api.crew.red/posts/${query.id}?_embed=comments`)
-                .then(data => setCurrentPost(data))
+            // getData(`http://localhost:8000/api/blog/`)
+            getData('https://mg-blog-api.herokuapp.com/api/blog')
+                .then(data => {
+                    dispatch(postsAction(data))
+                    const post = data.find((item: IPost) => item.id === +query.id!);
+                    setCurrentPost(post);
+                    forceUpdate();
+                })
+            // getData(`http://localhost:8000/api/comments/${query.id}`)
+            getData(`https://mg-blog-api.herokuapp.com/api/comments/${query.id}`)
+                .then(data => {
+                    setComments(data);
+                })
         }
     }, [query.id])
 
@@ -84,7 +96,7 @@ const post = ({ post }: IPostComponent) => {
         forceUpdate();
     }
 
-    if (!post) {
+    if (!currentPost) {
         return (
             <Wrapper>
                 <Header />
@@ -99,10 +111,10 @@ const post = ({ post }: IPostComponent) => {
         <Wrapper>
             <Header />
             <StyledH1>
-                {post.title}
+                {currentPost.title}
             </StyledH1>
             <StyledArticle>
-                {post.body}
+                {currentPost.body}
             </StyledArticle>
             <CommentsBlock>
                 <StyledCommentsHeader>
@@ -110,10 +122,8 @@ const post = ({ post }: IPostComponent) => {
                 </StyledCommentsHeader>
                 <NewCommentForm handleAddComment={handleAddComment} />
                 {
-                    currentPost ? currentPost.comments?.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
-                        : post.comments.length
-                            ? post.comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
-                            : 'No comments here'
+                    comments.length ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                        : 'No comments here'
                 }
             </CommentsBlock>
         </Wrapper >
@@ -122,7 +132,8 @@ const post = ({ post }: IPostComponent) => {
 
 
 export async function getStaticPaths() {
-    const res = await fetch('https://simple-blog-api.crew.red/posts')
+    // const res = await fetch('http://localhost:8000/api/blog')
+    const res = await fetch('https://mg-blog-api.herokuapp.com/api/blog')
     const posts = await res.json()
 
     const paths = posts.map((post: IPost) => ({
@@ -133,7 +144,9 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }: any) {
-    const post = await getData(`https://simple-blog-api.crew.red/posts/${params.id}?_embed=comments`)
+    // const posts = await getData(`http://localhost:8000/api/blog`)
+    const posts = await getData('https://mg-blog-api.herokuapp.com/api/blog');
+    const post = posts.filter((item: IPost) => item.id = params.id)
     return {
         props: { post: post }
     };

@@ -93,6 +93,7 @@ const NewPost = () => {
             axios({
                 method: 'post',
                 url: 'https://mg-blog-api.herokuapp.com/api/blog',
+                // url: 'http://localhost:8000/api/blog',
                 headers: {
                     'Content-Type': 'application/json'
                 },

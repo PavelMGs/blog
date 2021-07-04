@@ -57,12 +57,12 @@ const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }: INewCom
         if (commentValue.length > 0) {
             const data = {
                 "postId": +query.id!,
-                "body": commentValue
+                "body": commentValue,
             };
 
             axios({
                 method: 'post',
-                url: 'https://simple-blog-api.crew.red/comments',
+                url: 'http://localhost:8000/api/comments',
                 headers: {
                     'Content-Type': 'application/json'
                 },

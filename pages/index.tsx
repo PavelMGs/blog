@@ -37,8 +37,17 @@ const index = ({ data }: IIndex) => {
     const posts = useSelector((state: RootState) => state.posts)
     const dispatch = useDispatch();
 
+    // useEffect(() => {
+    //     if (!posts.length) {
+    //         getData('https://mg-blog-api.herokuapp.com/api/blog')
+    //             .then(data => dispatch(postsAction(data)))
+    //     }
+
+    // }, [])
+
     useEffect(() => {
         if (!posts.length) {
+            // getData('http://localhost:8000/api/blog')
             getData('https://mg-blog-api.herokuapp.com/api/blog')
                 .then(data => dispatch(postsAction(data)))
         }
@@ -84,8 +93,10 @@ const index = ({ data }: IIndex) => {
     )
 }
 
-export async function getStaticProps() {
-    const data = await getData('https://simple-blog-api.crew.red/posts')
+export async function getServerSideProps() {
+    // const data = await getData('http://localhost:8000/api/blog');
+    const data = await getData('https://mg-blog-api.herokuapp.com/api/blog');
+
     return {
         props: { data: data }
     };
