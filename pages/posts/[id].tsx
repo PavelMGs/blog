@@ -114,7 +114,7 @@ interface IPostComponent {
 const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
     const { query } = useRouter();
     const [currentPost, setCurrentPost] = useState<IPost | undefined>();
-    const [comments, setComments] = useState<ICommentRes[]>([])
+    const [comments, setComments] = useState<ICommentRes[] | []>([])
     const [delPassword, setDelPassword] = useState('');
     const [showDelInput, setShowDelInput] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -149,8 +149,7 @@ const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
     }, [query.id])
 
     const handleAddComment = (newComment: ICommentRes) => {
-        const newComments = comments;
-        newComments.push(newComment);
+        const newComments = [...comments, newComment]
         setComments(newComments)
     }
 
