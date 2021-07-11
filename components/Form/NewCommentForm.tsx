@@ -3,6 +3,7 @@ import { useRouter } from 'next/dist/client/router';
 import React, { FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import { ICommentRes } from '../../interfaces';
+import { host } from '../../utils/host';
 
 const StyledForm = styled.form`
     display: flex;
@@ -66,7 +67,7 @@ const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }: INewCom
 
             axios({
                 method: 'post',
-                url: 'http://localhost:8000/api/comments',
+                url: `${host}/api/comments`,
                 headers: {
                     'Content-Type': 'application/json'
                 },
