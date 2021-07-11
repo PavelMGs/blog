@@ -1,14 +1,17 @@
+import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
 import React, { useEffect, useReducer, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Comment from '../../components/Comment/Comment';
 import NewCommentForm from '../../components/Form/NewCommentForm';
 import Header from '../../components/Header/Header';
+import Modal from '../../components/Modal/Modal';
 import { ICommentRes, IPost } from '../../interfaces';
-// import { RootState } from '../../redux';
+import { RootState } from '../../redux';
 import { postsAction } from '../../redux/actions/postActions';
 import { getData } from '../../utils/getData';
+import { host } from '../../utils/host';
 
 const Wrapper = styled.div`
     display: flex;
@@ -42,7 +45,7 @@ const CommentsBlock = styled.div`
     align-items: center;
     width: 90%;
 
-    margin-bottom: 60px;
+    margin-bottom: 0px;
     margin-top: auto;
 `;
 
@@ -52,37 +55,93 @@ const StyledCommentsHeader = styled.h3`
     font-style: italic;
 `;
 
+const Delete = styled.button`
+    height: 45px;
+    width: 90%;
+    margin: 20px auto;
+
+    background: #1e88e5;
+
+    font-size: 20px;
+    color: white;
+
+    border-radius: 4px;
+    border: none;
+    box-shadow: 0 0 5px #424242;
+
+    & :active {
+        background: #1565c0;
+    }
+`;
+
+const DeletePass = styled.div`
+    position: absolute;
+    top: 35%;
+    left: auto;
+    right: auto;
+    height: 55px;
+    width: 500px;
+    box-shadow: 0px 0px 15px #424242;
+    border-radius: 4px;
+    overflow: hidden;
+`
+
+const DelInput = styled.input`
+    height: 100%;
+    width: 75%;
+    border: none;
+    padding: 10px;
+`
+
+const Button = styled.button`
+    width: 25%;
+    height: 100%;
+
+    background: #1e88e5;
+
+    color: white;
+`;
+
 interface IPostComponent {
-    post: {
+    ssr_post: {
         title: string;
         body: string;
         id: number;
-        comments: ICommentRes[];
     }
+    ssr_comments: ICommentRes[]
 }
 
-const post = ({ post }: IPostComponent) => {
+const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
     const { query } = useRouter();
     const [currentPost, setCurrentPost] = useState<IPost | undefined>();
     const [comments, setComments] = useState<ICommentRes[] | []>([])
+    const [delPassword, setDelPassword] = useState('');
+    const [showDelInput, setShowDelInput] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalText, setModalText] = useState('');
+    const [isDeleted, setIsDeleted] = useState(false);
     // eslint-disable-next-line no-unused-vars   
     const [ignored, forceUpdate] = useReducer(x => x + 1, 0); // ignored На то и ignored, что использовать мы его не будем. В то же время нам нужно деструктуриролвать второй аргумент.
-    // const posts = useSelector((state: RootState) => state.posts);
+    const posts = useSelector((state: RootState) => state.posts);
     const dispatch = useDispatch();
+    const router = useRouter();
 
 
     useEffect(() => {
         if (query.id) {
-            // getData(`http://localhost:8000/api/blog/`)
-            getData('https://mg-blog-api.herokuapp.com/api/blog')
-                .then(data => {
-                    dispatch(postsAction(data))
-                    const post = data.find((item: IPost) => item.id === +query.id!);
-                    setCurrentPost(post);
-                    forceUpdate();
-                })
-            // getData(`http://localhost:8000/api/comments/${query.id}`)
-            getData(`https://mg-blog-api.herokuapp.com/api/comments/${query.id}`)
+            if (!posts.length) {
+                getData(`${host}/api/blog`)
+                    .then(data => {
+                        dispatch(postsAction(data))
+                        const post = data.find((item: IPost) => item.id === +query.id!);
+                        setCurrentPost(post);
+                        forceUpdate();
+                    })
+            } else {
+                const post = posts.find((item: IPost) => item.id === +query.id!)
+                setCurrentPost(post);
+            }
+            getData(`${host}/api/comments/${query.id}`)
                 .then(data => {
                     setComments(data);
                 })
@@ -90,13 +149,46 @@ const post = ({ post }: IPostComponent) => {
     }, [query.id])
 
     const handleAddComment = (newComment: ICommentRes) => {
-        const newCurrentPost = currentPost;
-        newCurrentPost?.comments ? newCurrentPost?.comments.push(newComment) : null;
-        setCurrentPost(newCurrentPost);
-        forceUpdate();
+        const newComments = [...comments, newComment]
+        setComments(newComments)
     }
 
-    if (!currentPost) {
+    const handleDeletePost = () => {
+        axios({
+            method: 'delete',
+            url: `${host}/api/blog/${currentPost!.id}/${delPassword}`,
+            headers: {
+                'Content-type': 'application/json'
+            }
+        }).then(res => res.data)
+            .then(data => {
+                setModalText(data.message);
+                setShowModal(true);
+                const newPosts = posts.filter(item => item.id !== currentPost!.id);
+                dispatch(postsAction(newPosts));
+                setIsDeleted(true);
+            })
+            .catch(err => {
+                setModalText(err.response.data.message);
+                setShowModal(true);
+                setDelPassword('');
+            })
+    }
+
+    const handleCloseModal = () => {
+        if (isDeleted) {
+            router.push('/');
+        }
+        setShowModal(false);
+        setModalText('');
+    }
+
+    const handleDelInput = () => {
+        setShowDelInput(false);
+        handleDeletePost()
+    };
+
+    if (!currentPost && !ssr_post) {
         return (
             <Wrapper>
                 <Header />
@@ -111,29 +203,62 @@ const post = ({ post }: IPostComponent) => {
         <Wrapper>
             <Header />
             <StyledH1>
-                {currentPost.title}
+                {
+                    currentPost ? currentPost.title : ssr_post.title
+                }
             </StyledH1>
             <StyledArticle>
-                {currentPost.body}
+                {
+                    currentPost ? currentPost.body : ssr_post.body
+                }
             </StyledArticle>
+
             <CommentsBlock>
                 <StyledCommentsHeader>
                     Comments
                 </StyledCommentsHeader>
                 <NewCommentForm handleAddComment={handleAddComment} />
                 {
-                    comments.length ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
-                        : 'No comments here'
+                    comments.length
+                        ? comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                        : ssr_comments.length
+                            ? ssr_comments.map(({ body, id }: ICommentRes) => body.length ? <Comment body={body} key={id} /> : null)
+                            : 'No comments here'
                 }
             </CommentsBlock>
+            <Delete
+                onClick={() => setShowDelInput(true)}
+            >
+                Delete this post
+            </Delete>
+            {
+                showDelInput
+                    ? <DeletePass>
+                        <DelInput
+                            placeholder='Type password to delete a post'
+                            value={delPassword}
+                            onChange={(e) => setDelPassword(e.target.value)}
+                        />
+                        <Button
+                            onClick={handleDelInput}
+                        >
+                            Ok
+                        </Button>
+                    </DeletePass>
+                    : null
+            }
+            {
+                showModal
+                    ? <Modal text={modalText} close={handleCloseModal} />
+                    : null
+            }
         </Wrapper >
     )
 }
 
 
-export async function getStaticPaths() {
-    // const res = await fetch('http://localhost:8000/api/blog')
-    const res = await fetch('https://mg-blog-api.herokuapp.com/api/blog')
+export async function getServerSidePaths() {
+    const res = await fetch(`${host}/api/blog`)
     const posts = await res.json()
 
     const paths = posts.map((post: IPost) => ({
@@ -143,12 +268,13 @@ export async function getStaticPaths() {
     return { paths, fallback: false }
 }
 
-export async function getStaticProps({ params }: any) {
-    // const posts = await getData(`http://localhost:8000/api/blog`)
-    const posts = await getData('https://mg-blog-api.herokuapp.com/api/blog');
-    const post = posts.filter((item: IPost) => item.id = params.id)
+export async function getServerSideProps({ params }: any) {
+    const posts = await getData(`${host}/api/blog`);
+    const post = posts.find((item: IPost) => item.id === +params.id)
+
+    const comments = await getData(`${host}/api/comments/${params.id}`);
     return {
-        props: { post: post }
+        props: { ssr_post: post ? post : null, ssr_comments: comments }
     };
 }
 

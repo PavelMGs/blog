@@ -1,11 +1,15 @@
 import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
-import React, { FormEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { FormEvent, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Header from '../../components/Header/Header';
+import Modal from '../../components/Modal/Modal';
 import { IPost } from '../../interfaces';
-import { postAction } from '../../redux/actions/postActions';
+import { RootState } from '../../redux';
+import { postAction, postsAction } from '../../redux/actions/postActions';
+import { getData } from '../../utils/getData';
+import { host } from '../../utils/host';
 
 const Wrapper = styled.div`
     display: flex;
@@ -76,14 +80,27 @@ const NewPost = () => {
     const [body, setBody] = useState('');
     const router = useRouter();
     const dispatch = useDispatch();
+    const [showModal, setShowModal] = useState(false);
+    const [modalText, setModalText] = useState('');
+    const posts = useSelector((state: RootState) => state.posts)
+
+    useEffect(() => {
+        if (!posts.length) {
+            getData(`${host}/api/blog`)
+                .then(data => dispatch(postsAction(data)))
+        }
+
+    }, [])
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault()
 
         if (body.length <= 0) {
-            alert('You did not write a post')
+            setModalText('You did not write a post');
+            setShowModal(true);
         } else if (title.length <= 0) {
-            alert('Choose a title')
+            setModalText('Choose a title');
+            setShowModal(true);
         } else {
             const data = {
                 "title": title,
@@ -92,22 +109,30 @@ const NewPost = () => {
 
             axios({
                 method: 'post',
-                url: 'https://mg-blog-api.herokuapp.com/api/blog',
-                // url: 'http://localhost:8000/api/blog',
+                url: `${host}/api/blog`,
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 data: data
             })
                 .then(res => res.data)
-                .then((data: IPost) => dispatch(postAction(data)))
+                .then((data: { post: IPost }) => dispatch(postAction(data.post)))
                 ;
 
-            alert('Post is successfully created')
-
-            router.push('/');
+            setModalText('Post is successfully created');
+            setShowModal(true);
         }
     }
+
+    const handleCloseModal = () => {
+        if (body.length < 1 || title.length < 1) {
+            setModalText('');
+            setShowModal(false);
+        } else {
+            router.push('/')
+        }
+    }
+
     return (
         <Wrapper>
             <Header />
@@ -129,6 +154,11 @@ const NewPost = () => {
                     type="submit"
                 />
             </StyledForm>
+            {
+                showModal
+                    ? <Modal text={modalText} close={handleCloseModal} />
+                    : null
+            }
         </Wrapper>
     )
 }

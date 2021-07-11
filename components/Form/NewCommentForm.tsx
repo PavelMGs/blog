@@ -41,6 +41,10 @@ const StyledSubmit = styled.input`
     border-radius: 4px;
     border: none;
     box-shadow: 0 0 5px #424242;
+
+    & :active {
+        background: #1565c0;
+    }
 `;
 
 interface INewCommentForm {

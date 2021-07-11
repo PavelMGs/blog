@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import Post from '../components/Post/Post';
@@ -7,6 +7,7 @@ import { postsAction } from '../redux/actions/postActions';
 import Header from '../components/Header/Header';
 import { getData } from '../utils/getData';
 import { IPost } from '../interfaces';
+import { host } from '../utils/host';
 
 const Wrapper = styled.div`
     display: flex;
@@ -28,38 +29,22 @@ const Posts = styled.div`
 `;
 
 interface IIndex {
-    data: IPost[],
+    ssr_data: IPost[],
 }
 
-const index = ({ data }: IIndex) => {
-    // eslint-disable-next-line no-unused-vars
-    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
+const index = ({ ssr_data }: IIndex) => {
     const posts = useSelector((state: RootState) => state.posts)
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     if (!posts.length) {
-    //         getData('https://mg-blog-api.herokuapp.com/api/blog')
-    //             .then(data => dispatch(postsAction(data)))
-    //     }
-
-    // }, [])
-
     useEffect(() => {
         if (!posts.length) {
-            // getData('http://localhost:8000/api/blog')
-            getData('https://mg-blog-api.herokuapp.com/api/blog')
+            getData(`${host}/api/blog`)
                 .then(data => dispatch(postsAction(data)))
         }
 
     }, [])
 
-    useEffect(() => {
-        forceUpdate()
-    }, [posts])
-
-
-    if (!posts.length) {
+    if (!ssr_data.length && !posts.length) {
         return (
             <Wrapper>
                 <Header />
@@ -79,8 +64,8 @@ const index = ({ data }: IIndex) => {
                             id={item.id}
                             key={item.id}
                         />)
-                        : data.length
-                            ? data.map(item => <Post
+                        : ssr_data.length
+                            ? ssr_data.map(item => <Post
                                 title={item.title}
                                 body={item.body}
                                 id={item.id}
@@ -94,11 +79,10 @@ const index = ({ data }: IIndex) => {
 }
 
 export async function getServerSideProps() {
-    // const data = await getData('http://localhost:8000/api/blog');
-    const data = await getData('https://mg-blog-api.herokuapp.com/api/blog');
+    const data = await getData(`${host}/api/blog`);
 
     return {
-        props: { data: data }
+        props: { ssr_data: data }
     };
 }
 
