@@ -149,7 +149,8 @@ const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
     }, [query.id])
 
     const handleAddComment = (newComment: ICommentRes) => {
-        const newComments = [...comments, newComment]
+        const newComments = comments;
+        newComments.push(newComment);
         setComments(newComments)
     }
 
