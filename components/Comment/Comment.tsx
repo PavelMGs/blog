@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 const Wrapper = styled.div`
     font-size: 2em;
-    width: 100%;
+    width: 90%;
     box-shadow: 0 0 10px #424242;
     margin: 10px auto;
     padding: 10px;

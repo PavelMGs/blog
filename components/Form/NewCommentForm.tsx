@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useRouter } from 'next/dist/client/router';
-import React, { FormEvent, useState } from 'react';
+import React, { BaseSyntheticEvent, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import { ICommentRes } from '../../interfaces';
 import { host } from '../../utils/host';
@@ -9,7 +9,7 @@ const StyledForm = styled.form`
     display: flex;
     flex-direction: row;
     align-items: center;
-    width: 100%;
+    width: 90%;
 
 `;
 
@@ -56,6 +56,16 @@ const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }: INewCom
     const { query } = useRouter();
     const [commentValue, setCommentValue] = useState('');
 
+    const handleChange = (e: BaseSyntheticEvent) => {
+        if (commentValue.length > 0) {
+            setCommentValue(e.target!.value);
+        } else {
+            e.target.value !== ' '
+                ? setCommentValue(e.target.value)
+                : null
+        }
+    }
+
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
@@ -85,7 +95,7 @@ const NewCommentForm: React.FC<INewCommentForm> = ({ handleAddComment }: INewCom
             <StyledInput
                 placeholder='Type your comment'
                 value={commentValue}
-                onChange={(e) => setCommentValue(e.target.value)}
+                onChange={handleChange}
             />
             <StyledSubmit type='submit' value="Submit" />
         </StyledForm>

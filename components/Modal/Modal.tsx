@@ -47,6 +47,8 @@ const Button = styled.button`
     color: white;
 
     border-radius: 4px;
+
+    cursor: pointer;
 `;
 
 interface IModal {
