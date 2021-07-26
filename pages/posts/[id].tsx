@@ -38,6 +38,8 @@ const StyledArticle = styled.article`
     width: 80%;
 
     text-align: justify;
+    
+    white-space: pre-wrap;
 `;
 
 const CommentsBlock = styled.div`
@@ -299,7 +301,7 @@ const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
             </StyledH1>
             <StyledArticle>
                 {
-                    currentPost ? <pre>{currentPost.body}</pre> : ssr_post.body
+                    currentPost ? currentPost.body : ssr_post.body
                 }
             </StyledArticle>
 
