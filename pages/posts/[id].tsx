@@ -299,7 +299,7 @@ const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
             </StyledH1>
             <StyledArticle>
                 {
-                    currentPost ? currentPost.body : ssr_post.body
+                    currentPost ? <pre>{currentPost.body}</pre> : ssr_post.body
                 }
             </StyledArticle>
 
