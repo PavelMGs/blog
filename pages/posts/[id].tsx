@@ -38,7 +38,7 @@ const StyledArticle = styled.article`
     width: 80%;
 
     text-align: justify;
-
+    
     white-space: pre-wrap;
 `;
 
