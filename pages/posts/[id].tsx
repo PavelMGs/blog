@@ -375,7 +375,7 @@ const post = ({ ssr_post, ssr_comments }: IPostComponent) => {
 }
 
 
-export async function getServerSidePaths() {
+export async function getStaticPaths() {
     const res = await fetch(`${host}/api/blog`)
     const posts = await res.json()
 
@@ -386,7 +386,7 @@ export async function getServerSidePaths() {
     return { paths, fallback: false }
 }
 
-export async function getServerSideProps({ params }: any) {
+export async function getStaticProps({ params }: any) {
     const posts = await getData(`${host}/api/blog`);
     const post = posts.find((item: IPost) => item.id === +params.id)
 
