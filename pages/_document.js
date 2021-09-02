@@ -1,3 +1,4 @@
+/* // eslint-disable react/display-name */
 import React from 'react'
 import NextDocument from 'next/document'
 import { ServerStyleSheet } from 'styled-components'
