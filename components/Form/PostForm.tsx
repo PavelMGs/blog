@@ -1,6 +1,7 @@
 import React, { FormEvent } from 'react'
 import styled from 'styled-components';
 import Modal from '../Modal/Modal';
+import s from './new.module.css';
 
 const Wrapper = styled.div`
     display: flex;
@@ -99,6 +100,7 @@ const PostForm = ({ handleSubmit, handleChangeBody, handleChangeTitle, handleClo
                 <StyledSubmit
                     value="Submit"
                     type="submit"
+                    className={s.input}
                 />
             </StyledForm>
             {

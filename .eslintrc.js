@@ -14,7 +14,7 @@ module.exports = {
   },
   plugins: ['react', '@typescript-eslint'],
   rules: {
-    'no-console': 'error',
+    'no-console': 'off',
     'require-jsdoc': 'off',
     'camelcase': 'off'
   },
