@@ -383,7 +383,7 @@ export async function getStaticPaths() {
         params: { id: `${post.id}` },
     }))
 
-    return { paths, fallback: false }
+    return { paths, fallback: true }
 }
 
 export async function getStaticProps({ params }: any) {
@@ -392,7 +392,7 @@ export async function getStaticProps({ params }: any) {
 
     const comments = await getData(`${host}/api/comments/${params.id}`);
     return {
-        props: { ssr_post: post ? post : null, ssr_comments: comments }
+        props: { ssr_post: post ? post : null, ssr_comments: comments, revalidate: 10 }
     };
 }
 
