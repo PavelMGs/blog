@@ -388,7 +388,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }: any) {
     const posts = await getData(`${host}/api/blog`);
-    const post = posts.find((item: IPost) => item.id === +params.id)
+    const post = posts.find((item: IPost) => item.id === +params.id);
 
     const comments = await getData(`${host}/api/comments/${params.id}`);
     return {
